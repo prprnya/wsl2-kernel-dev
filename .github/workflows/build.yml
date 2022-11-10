@@ -12,6 +12,6 @@ jobs:
       - run: make
       - name: Test kernel module
         run: |
-        sudo insmod *.ko
-        sudo rmmod *.ko
-        sudo dmesg | tail
+          sudo insmod *.ko
+          sudo rmmod *.ko
+          sudo dmesg | tail
