@@ -5,6 +5,7 @@ COPY linux /usr/src/linux
 
 WORKDIR /usr/src/linux
 RUN make headers_install modules_install -j $(nproc)
-RUN apt-get -y install --no-install-recommends kmod
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends kmod
 
 WORKDIR /
