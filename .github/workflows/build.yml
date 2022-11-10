@@ -1,59 +1,11 @@
 on: [push]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-
 jobs:
   kernel:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: actions/checkout@v3
-      - name: Get kernel source
-        uses: actions/checkout@v3
-        with:
-          repository: microsoft/WSL2-Linux-Kernel
-          ref: ${{ github.ref_name }}
-          path: linux
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get -y install --no-install-recommends libelf-dev build-essential pkg-config bison flex libssl-dev bc dwarves
-      - name: Cache kernel build
-        uses: actions/cache@v3
-        with:
-          path: linux/build
-          key: ${{ runner.os }}-kernel-build-${{ github.ref_name }}
-          restore-keys: |
-            ${{ runner.os }}-kernel-build-
-      - name: Build kernel
-        run: |
-          cd linux \
-          && cp Microsoft/config-wsl .config \
-          && scripts/config --disable DEBUG_INFO \
-          && make -j$(nproc)
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          sudo apt-get install linux-headers-$(uname -r)
