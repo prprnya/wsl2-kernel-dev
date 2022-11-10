@@ -10,4 +10,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install linux-headers-$(uname -r) kmod
       - run: make
-      - run: sudo dmesg | tail
+      - name: Test kernel module
+        run: |
+        sudo insmod *.ko
+        sudo rmmod *.ko
+        sudo dmesg | tail
